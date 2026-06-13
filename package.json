@@ -1,0 +1,69 @@
+{
+  "name": "yoshlar-360",
+  "version": "1.0.0",
+  "description": "Yoshlar-360: Enterprise Youth Affairs Platform",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:backend": "turbo run dev --filter=backend",
+    "dev:admin": "turbo run dev --filter=admin-panel",
+    "dev:mobile": "cd apps/mobile && flutter pub get && flutter run -d chrome",
+    "build": "turbo run build",
+    "build:backend": "turbo run build --filter=backend",
+    "build:admin": "turbo run build --filter=admin-panel",
+    "test": "turbo run test --parallel",
+    "test:unit": "turbo run test:unit --parallel",
+    "test:integration": "turbo run test:integration --parallel",
+    "test:e2e": "turbo run test:e2e",
+    "test:coverage": "turbo run test:coverage --parallel",
+    "lint": "turbo run lint --parallel",
+    "format": "turbo run format --parallel",
+    "type-check": "turbo run type-check --parallel",
+    "db:migrate": "turbo run db:migrate --filter=backend",
+    "db:seed": "turbo run db:seed --filter=backend",
+    "db:reset": "turbo run db:reset --filter=backend",
+    "db:generate": "turbo run db:generate --filter=backend",
+    "db:studio": "turbo run db:studio --filter=backend",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:ps": "docker-compose ps",
+    "clean": "turbo run clean --parallel && rm -rf node_modules dist .turbo",
+    "deps:check": "turbo run deps:check --parallel",
+    "deps:update": "turbo run deps:update --parallel",
+    "prepare": "husky install"
+  },
+  "workspaces": [
+    "apps/backend",
+    "apps/admin-panel",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "eslint": "^8.56.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.1.1",
+    "turbo": "^1.11.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "keywords": [
+    "uzbekistan",
+    "youth",
+    "employment",
+    "education",
+    "government",
+    "enterprise",
+    "nestjs",
+    "nextjs",
+    "flutter"
+  ],
+  "author": "Yoshlar-360 Team",
+  "license": "PROPRIETARY"
+}
