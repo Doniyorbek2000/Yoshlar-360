@@ -1,0 +1,95 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.local", "**/.env"],
+  "globalEnv": [
+    "NODE_ENV",
+    "LOG_LEVEL",
+    "DATABASE_URL",
+    "REDIS_HOST",
+    "JWT_SECRET"
+  ],
+  "tasks": {
+    "build": {
+      "description": "Build application",
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "build/**"],
+      "cache": true
+    },
+    "dev": {
+      "description": "Start development server",
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "description": "Run linter",
+      "outputs": [".eslintcache"],
+      "cache": true
+    },
+    "format": {
+      "description": "Format code with Prettier",
+      "cache": false
+    },
+    "type-check": {
+      "description": "Type check TypeScript",
+      "cache": true
+    },
+    "test": {
+      "description": "Run all tests",
+      "dependsOn": ["build"],
+      "cache": true,
+      "outputs": ["coverage/**"]
+    },
+    "test:unit": {
+      "description": "Run unit tests",
+      "cache": true,
+      "outputs": ["coverage/**"]
+    },
+    "test:integration": {
+      "description": "Run integration tests",
+      "cache": false
+    },
+    "test:e2e": {
+      "description": "Run end-to-end tests",
+      "cache": false
+    },
+    "test:coverage": {
+      "description": "Run tests with coverage",
+      "cache": true,
+      "outputs": ["coverage/**"]
+    },
+    "db:migrate": {
+      "description": "Run database migrations",
+      "cache": false
+    },
+    "db:seed": {
+      "description": "Seed database with test data",
+      "cache": false
+    },
+    "db:reset": {
+      "description": "Reset database (dev only)",
+      "cache": false
+    },
+    "db:generate": {
+      "description": "Generate Prisma client",
+      "cache": true,
+      "outputs": ["node_modules/.prisma/**"]
+    },
+    "db:studio": {
+      "description": "Open Prisma Studio",
+      "cache": false,
+      "persistent": true
+    },
+    "clean": {
+      "description": "Clean build artifacts",
+      "cache": false
+    },
+    "deps:check": {
+      "description": "Check dependencies",
+      "cache": true
+    },
+    "deps:update": {
+      "description": "Update dependencies",
+      "cache": false
+    }
+  }
+}
