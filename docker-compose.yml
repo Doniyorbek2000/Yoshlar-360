@@ -1,0 +1,258 @@
+version: '3.9'
+
+services:
+  # ========================================
+  # PostgreSQL Database
+  # ========================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: yoshlar-360-postgres
+    environment:
+      POSTGRES_USER: yoshlar
+      POSTGRES_PASSWORD: yoshlar360
+      POSTGRES_DB: yoshlar_360_db
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yoshlar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yoshlar-network
+
+  # ========================================
+  # Redis Cache & Queue
+  # ========================================
+  redis:
+    image: redis:7-alpine
+    container_name: yoshlar-360-redis
+    command: redis-server --appendonly yes --requirepass ""
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yoshlar-network
+
+  # ========================================
+  # MinIO Object Storage
+  # ========================================
+  minio:
+    image: minio/minio:latest
+    container_name: yoshlar-360-minio
+    command: server /minio_data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/minio_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - yoshlar-network
+
+  # ========================================
+  # Elasticsearch
+  # ========================================
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: yoshlar-360-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - yoshlar-network
+
+  # ========================================
+  # RabbitMQ Message Queue
+  # ========================================
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: yoshlar-360-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - yoshlar-network
+
+  # ========================================
+  # NestJS Backend API
+  # ========================================
+  backend:
+    build:
+      context: .
+      dockerfile: ./infrastructure/docker/Dockerfile.backend
+    container_name: yoshlar-360-backend
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://yoshlar:yoshlar360@postgres:5432/yoshlar_360_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      ELASTICSEARCH_NODE: http://elasticsearch:9200
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    ports:
+      - "3000:3000"
+      - "9090:9090"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./apps/backend/src:/app/src
+      - ./apps/backend/dist:/app/dist
+      - /app/node_modules
+    networks:
+      - yoshlar-network
+
+  # ========================================
+  # Next.js Admin Panel
+  # ========================================
+  admin-panel:
+    build:
+      context: .
+      dockerfile: ./infrastructure/docker/Dockerfile.admin
+    container_name: yoshlar-360-admin
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api
+      NEXT_PUBLIC_APP_URL: http://localhost:3001
+    ports:
+      - "3001:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./apps/admin-panel/src:/app/src
+      - ./apps/admin-panel/.next:/app/.next
+      - /app/node_modules
+    networks:
+      - yoshlar-network
+
+  # ========================================
+  # Prometheus Metrics
+  # ========================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: yoshlar-360-prometheus
+    volumes:
+      - ./infrastructure/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9091:9090"
+    networks:
+      - yoshlar-network
+
+  # ========================================
+  # Grafana Dashboards
+  # ========================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: yoshlar-360-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_USER: admin
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infrastructure/monitoring/grafana:/etc/grafana/provisioning
+    ports:
+      - "3002:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - yoshlar-network
+
+  # ========================================
+  # Loki Logs Aggregation
+  # ========================================
+  loki:
+    image: grafana/loki:latest
+    container_name: yoshlar-360-loki
+    volumes:
+      - ./infrastructure/monitoring/loki-config.yml:/etc/loki/local-config.yml
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yml
+    ports:
+      - "3100:3100"
+    networks:
+      - yoshlar-network
+
+  # ========================================
+  # Nginx Reverse Proxy
+  # ========================================
+  nginx:
+    image: nginx:alpine
+    container_name: yoshlar-360-nginx
+    volumes:
+      - ./infrastructure/docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/docker/ssl:/etc/nginx/ssl:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - admin-panel
+    networks:
+      - yoshlar-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  elasticsearch_data:
+  rabbitmq_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+
+networks:
+  yoshlar-network:
+    driver: bridge
