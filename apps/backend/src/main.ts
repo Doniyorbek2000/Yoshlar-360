@@ -1,10 +1,12 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import compression from 'compression';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,24 +16,26 @@ async function bootstrap() {
   app.use(compression());
 
   app.enableCors({
-    origin: configService.get('CORS_ORIGINS', '').split(','),
+    origin: configService.get('CORS_ORIGINS', 'http://localhost:3001').split(','),
     credentials: true,
   });
 
-  app.setGlobalPrefix(configService.get('API_PREFIX', '/api'));
-  app.enableVersioning({ type: VersioningType.URI });
+  app.setGlobalPrefix('api');
 
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-    })
+    }),
   );
 
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalInterceptors(new ResponseInterceptor());
+
   const config = new DocumentBuilder()
-    .setTitle('Yoshlar-360 API')
-    .setDescription('Enterprise Youth Affairs Platform')
+    .setTitle('Yoshlar 360 API')
+    .setDescription('Yoshlar bilan ishlash platformasi')
     .setVersion('1.0.0')
     .addBearerAuth()
     .build();
@@ -41,7 +45,8 @@ async function bootstrap() {
 
   const port = configService.get('API_PORT', 3000);
   await app.listen(port);
-  console.log(`API running on http://localhost:${port}`);
+  console.log(`Yoshlar 360 API running on http://localhost:${port}`);
+  console.log(`Swagger docs: http://localhost:${port}/api/docs`);
 }
 
 bootstrap();

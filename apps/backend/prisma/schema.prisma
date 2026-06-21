@@ -7,28 +7,369 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
-  username  String  @unique
-  password  String
-  role      String  @default("user")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum Role {
+  SUPER_ADMIN
+  REPUBLIC_ADMIN
+  REGION_ADMIN
+  DISTRICT_ADMIN
+  MAHALLA_LEADER
+  YOUTH
+  MODERATOR
 }
 
-model Youth {
-  id         String   @id @default(uuid())
-  firstName  String
-  lastName   String
-  email      String?  @unique
-  phone      String?
-  birthDate  DateTime?
-  region     String?
-  district   String?
-  neighborhood String?
-  socialStatus String?
-  educationLevel String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AppealStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum ProblemStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum EducationLevel {
+  NONE
+  SECONDARY
+  VOCATIONAL
+  HIGHER
+  MASTERS
+  PHD
+}
+
+enum EmploymentStatus {
+  EMPLOYED
+  UNEMPLOYED
+  STUDENT
+  SELF_EMPLOYED
+  OTHER
+}
+
+enum SocialStatus {
+  NORMAL
+  ORPHAN
+  DISABLED
+  LOW_INCOME
+  SINGLE_PARENT
+  OTHER
+}
+
+enum ImportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum NotificationType {
+  SYSTEM
+  APPEAL
+  TASK
+  KPI
+  BROADCAST
+}
+
+model Region {
+  id        Int        @id @default(autoincrement())
+  nameUz    String
+  nameRu    String
+  districts District[]
+  users     User[]
+  appeals   Appeal[]
+  problems  Problem[]
+  kpiRecords KpiRecord[]
+  reports   Report[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("regions")
+}
+
+model District {
+  id        Int       @id @default(autoincrement())
+  nameUz    String
+  nameRu    String
+  regionId  Int
+  region    Region    @relation(fields: [regionId], references: [id])
+  mahallas  Mahalla[]
+  users     User[]
+  appeals   Appeal[]
+  problems  Problem[]
+  kpiRecords KpiRecord[]
+  reports   Report[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("districts")
+}
+
+model Mahalla {
+  id         Int       @id @default(autoincrement())
+  nameUz     String
+  nameRu     String
+  districtId Int
+  district   District  @relation(fields: [districtId], references: [id])
+  users      User[]
+  appeals    Appeal[]
+  problems   Problem[]
+  kpiRecords KpiRecord[]
+  reports    Report[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("mahallas")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  fullName     String
+  phone        String?   @unique
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(YOUTH)
+  regionId     Int?
+  region       Region?   @relation(fields: [regionId], references: [id])
+  districtId   Int?
+  district     District? @relation(fields: [districtId], references: [id])
+  mahallaId    Int?
+  mahalla      Mahalla?  @relation(fields: [mahallaId], references: [id])
+  telegramId   String?   @unique
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  youthProfile    YouthProfile?
+  createdAppeals  Appeal[]       @relation("AppealCreator")
+  assignedAppeals Appeal[]       @relation("AppealAssignee")
+  createdProblems Problem[]      @relation("ProblemCreator")
+  assignedProblems Problem[]     @relation("ProblemAssignee")
+  createdTasks    Task[]         @relation("TaskCreator")
+  assignedTasks   Task[]         @relation("TaskAssignee")
+  kpiRecords      KpiRecord[]
+  reports         Report[]
+  notifications   Notification[]
+  importJobs      ImportJob[]
+  auditLogs       AuditLog[]
+  refreshTokens   RefreshToken[]
+  appealComments  AppealComment[]
+
+  @@map("users")
+}
+
+model YouthProfile {
+  id               Int              @id @default(autoincrement())
+  userId           Int              @unique
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  birthDate        DateTime?
+  gender           Gender?
+  passportOrPinfl  String?
+  education        EducationLevel?
+  employmentStatus EmploymentStatus?
+  socialStatus     SocialStatus?
+  address          String?
+  interests        String?
+  riskLevel        RiskLevel        @default(LOW)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@map("youth_profiles")
+}
+
+model Appeal {
+  id           Int          @id @default(autoincrement())
+  title        String
+  description  String
+  category     String
+  status       AppealStatus @default(NEW)
+  priority     Priority     @default(MEDIUM)
+  youthId      Int
+  youth        User         @relation("AppealCreator", fields: [youthId], references: [id])
+  assignedToId Int?
+  assignedTo   User?        @relation("AppealAssignee", fields: [assignedToId], references: [id])
+  regionId     Int?
+  region       Region?      @relation(fields: [regionId], references: [id])
+  districtId   Int?
+  district     District?    @relation(fields: [districtId], references: [id])
+  mahallaId    Int?
+  mahalla      Mahalla?     @relation(fields: [mahallaId], references: [id])
+  comments     AppealComment[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@map("appeals")
+}
+
+model AppealComment {
+  id        Int      @id @default(autoincrement())
+  appealId  Int
+  appeal    Appeal   @relation(fields: [appealId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  text      String
+  createdAt DateTime @default(now())
+
+  @@map("appeal_comments")
+}
+
+model Problem {
+  id           Int           @id @default(autoincrement())
+  title        String
+  description  String
+  category     String
+  status       ProblemStatus @default(OPEN)
+  priority     Priority      @default(MEDIUM)
+  regionId     Int?
+  region       Region?       @relation(fields: [regionId], references: [id])
+  districtId   Int?
+  district     District?     @relation(fields: [districtId], references: [id])
+  mahallaId    Int?
+  mahalla      Mahalla?      @relation(fields: [mahallaId], references: [id])
+  createdById  Int
+  createdBy    User          @relation("ProblemCreator", fields: [createdById], references: [id])
+  assignedToId Int?
+  assignedTo   User?         @relation("ProblemAssignee", fields: [assignedToId], references: [id])
+  deadline     DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("problems")
+}
+
+model Task {
+  id           Int        @id @default(autoincrement())
+  title        String
+  description  String?
+  status       TaskStatus @default(TODO)
+  priority     Priority   @default(MEDIUM)
+  assignedToId Int?
+  assignedTo   User?      @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  createdById  Int
+  createdBy    User       @relation("TaskCreator", fields: [createdById], references: [id])
+  deadline     DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("tasks")
+}
+
+model KpiRecord {
+  id         Int       @id @default(autoincrement())
+  userId     Int?
+  user       User?     @relation(fields: [userId], references: [id])
+  regionId   Int?
+  region     Region?   @relation(fields: [regionId], references: [id])
+  districtId Int?
+  district   District? @relation(fields: [districtId], references: [id])
+  mahallaId  Int?
+  mahalla    Mahalla?  @relation(fields: [mahallaId], references: [id])
+  metric     String
+  value      Float
+  period     String
+  createdAt  DateTime  @default(now())
+
+  @@map("kpi_records")
+}
+
+model Report {
+  id          Int       @id @default(autoincrement())
+  title       String
+  type        String
+  fileUrl     String?
+  createdById Int
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  regionId    Int?
+  region      Region?   @relation(fields: [regionId], references: [id])
+  districtId  Int?
+  district    District? @relation(fields: [districtId], references: [id])
+  mahallaId   Int?
+  mahalla     Mahalla?  @relation(fields: [mahallaId], references: [id])
+  createdAt   DateTime  @default(now())
+
+  @@map("reports")
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  user      User             @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      NotificationType @default(SYSTEM)
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
+
+model ImportJob {
+  id          Int          @id @default(autoincrement())
+  fileUrl     String
+  status      ImportStatus @default(PENDING)
+  totalRows   Int          @default(0)
+  successRows Int          @default(0)
+  failedRows  Int          @default(0)
+  errorLog    String?
+  createdById Int
+  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdAt   DateTime     @default(now())
+
+  @@map("import_jobs")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  oldValue  Json?
+  newValue  Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@map("refresh_tokens")
 }

@@ -1,0 +1,23 @@
+{
+  "name": "yoshlar-360-bot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/bot.ts",
+    "build": "tsc",
+    "start": "node dist/bot.js"
+  },
+  "dependencies": {
+    "telegraf": "^4.15.0",
+    "@prisma/client": "^5.7.1",
+    "argon2": "^0.31.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.6",
+    "ts-node-dev": "^2.0.0",
+    "ts-node": "^10.9.2",
+    "prisma": "^5.7.1"
+  }
+}

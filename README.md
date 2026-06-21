@@ -1,381 +1,196 @@
-# 🚀 Yoshlar-360: Enterprise Youth Affairs Platform
+# Yoshlar 360
 
-**Uzbekistan's unified digital platform for youth employment, education, and services management.**
+O'zbekiston yoshlar bilan ishlash platformasi - Youth Management Platform for Uzbekistan.
 
-## 📋 Project Overview
+## Texnologiyalar
 
-Yoshlar-360 is a government-grade, enterprise-ready platform designed to manage the entire youth ecosystem in Uzbekistan:
+| Komponent | Texnologiya |
+|-----------|-------------|
+| Backend API | NestJS, Prisma ORM, PostgreSQL |
+| Frontend | Next.js 14, TypeScript, Tailwind CSS |
+| Telegram Bot | Telegraf.js |
+| Auth | JWT + Refresh Token Rotation, Argon2 |
+| Database | PostgreSQL 16 |
+| Cache | Redis 7 |
+| DevOps | Docker, Docker Compose, Nginx |
 
-- **Geographic Hierarchy**: Republic → Region (Viloyat) → District (Tuman) → Neighborhood (Mahalla)
-- **Youth Registry**: Comprehensive database with AI profiling
-- **Employment Management**: Job matching, vacancy management
-- **Education & Training**: Courses, certifications, skill development
-- **Grant Management**: Entrepreneurship grants, applications
-- **Problem Resolution**: Issue tracking and resolution
-- **Analytics & Forecasting**: AI-powered predictions and KPIs
-- **Omnichannel Support**: Web, Mobile, Telegram Bot, Call Center
+## Tizim darajalari
 
-## 🏗️ Architecture
+1. **SUPER_ADMIN** - Barcha tizimni boshqaradi
+2. **REPUBLIC_ADMIN** - Respublika darajasida boshqaruv
+3. **REGION_ADMIN** - Viloyat darajasida boshqaruv
+4. **DISTRICT_ADMIN** - Tuman darajasida boshqaruv
+5. **MAHALLA_LEADER** - Mahalla yetakchisi
+6. **YOUTH** - Oddiy foydalanuvchi / yosh
+7. **MODERATOR** - Moderator
 
-### Technology Stack
-
-**Backend**
-- Framework: NestJS 12+
-- Language: TypeScript
-- Database: PostgreSQL 16
-- ORM: Prisma
-- Cache: Redis
-- Queue: BullMQ
-- Search: Elasticsearch
-- Storage: MinIO/S3
-- Real-time: Socket.IO
-
-**Frontend**
-- Admin Panel: Next.js 15 + TypeScript
-- UI Framework: TailwindCSS + Shadcn UI
-- Mobile: Flutter 3.32+
-
-**DevOps**
-- Containerization: Docker & Docker Compose
-- CI/CD: GitHub Actions
-- Reverse Proxy: Nginx
-- Monitoring: Prometheus & Grafana
-- Logging: Loki
-- Error Tracking: Sentry
-
-## 📁 Project Structure
+## Loyiha tuzilmasi
 
 ```
 yoshlar-360/
-├── apps/
-│   ├── backend/                    # NestJS Application
-│   │   ├── src/
-│   │   │   ├── core/              # Core modules & guards
-│   │   │   ├── modules/           # Feature modules
-│   │   │   ├── common/            # Shared utilities
-│   │   │   ├── database/          # Prisma & migrations
-│   │   │   ├── config/            # Environment configs
-│   │   │   └── main.ts
-│   │   ├── test/                  # E2E & Integration tests
-│   │   ├── Dockerfile
-│   │   └── package.json
-│   │
-│   ├── admin-panel/               # Next.js Admin Dashboard
-│   │   ├── src/
-│   │   │   ├── app/              # App directory (Next 15)
-│   │   │   ├── components/       # Reusable components
-│   │   │   ├── features/         # Feature modules
-│   │   │   ├── hooks/            # Custom React hooks
-│   │   │   ├── lib/              # Utilities & helpers
-│   │   │   └── types/            # TypeScript types
-│   │   ├── public/
-│   │   ├── Dockerfile
-│   │   └── package.json
-│   │
-│   └── mobile/                    # Flutter Mobile App
-│       ├── lib/
-│       │   ├── features/         # Feature modules
-│       │   ├── core/             # Core services
-│       │   ├── common/           # Shared widgets
-│       │   ├── main.dart
-│       │   └── config/
-│       ├── android/
-│       ├── ios/
-│       ├── Dockerfile
-│       └── pubspec.yaml
-│
-├── packages/                       # Shared Libraries
-│   ├── sdk/                       # TypeScript SDK for API
-│   └── ui-kit/                    # Shared UI components
-│
-├── infrastructure/                 # DevOps & Infrastructure
-│   ├── docker/
-│   │   ├── docker-compose.yml
-│   │   ├── Dockerfile.backend
-│   │   ├── Dockerfile.admin
-│   │   └── Dockerfile.nginx
-│   ├── kubernetes/               # K8s manifests
-│   ├── terraform/                # Infrastructure as Code
-│   └── monitoring/               # Prometheus, Grafana configs
-│
-├── docs/                          # Documentation
-│   ├── API.md                    # API Documentation
-│   ├── ARCHITECTURE.md           # System Architecture
-│   ├── DEPLOYMENT.md             # Deployment Guide
-│   ├── DATABASE.md               # Database Schema
-│   └── roles-and-permissions.md  # RBAC/ABAC Guide
-│
-├── scripts/                        # Utility scripts
-│   ├── setup.sh
-│   ├── migrate.sh
-│   └── seed-data.sh
-│
-├── .github/
-│   └── workflows/                # GitHub Actions
-│       ├── ci-backend.yml
-│       ├── ci-admin.yml
-│       ├── ci-mobile.yml
-│       └── deploy.yml
-│
-├── docker-compose.yml            # Local development
-├── .env.example
-├── package.json                  # Workspace root
-├── tsconfig.json
-├── turbo.json                    # Monorepo build orchestration
-└── README.md
+  apps/
+    backend/          # NestJS API
+      prisma/         # Schema va seed
+      src/
+        common/       # Guards, decorators, filters, interceptors
+        database/     # Prisma service
+        modules/      # Auth, Users, Youth, Appeals, Problems,
+                      # Tasks, KPI, Reports, Imports, Notifications,
+                      # Dashboard, AuditLog, Regions, Health
+    web/              # Next.js Admin Panel
+      src/
+        app/          # Pages (App Router)
+        components/
+        lib/          # API client, utils
+        store/        # Zustand store
+    bot/              # Telegram Bot (Telegraf.js)
+      src/
+        i18n/         # Uzbek/Russian translations
+        keyboards/
+  docker/             # Dockerfiles, nginx.conf
+  docker-compose.yml
+  pnpm-workspace.yaml
 ```
 
-## 🔐 Security Features
+## Tez boshlash (Development)
 
-- **Authentication**: JWT + Refresh Tokens, OTP (SMS/Email), OneID, Google, Telegram Login
-- **Authorization**: RBAC (Role-Based Access Control) + ABAC (Attribute-Based Access Control)
-- **Security Headers**: CORS, CSP, X-Frame-Options
-- **Rate Limiting**: DDoS protection via Nginx
-- **Encryption**: At-rest (AES-256) + In-transit (TLS 1.3)
-- **Device Tracking**: Session management, device fingerprinting
-- **Audit Logging**: Complete action tracking (who, when, what, from where)
-- **OWASP Top 10**: XSS, CSRF, SQL Injection protections
-- **2FA**: Time-based OTP (TOTP)
-- **GDPR-Style Privacy**: Data anonymization, right to be forgotten
+### 1. Talablar
 
-## 👥 Roles & Permissions
-
-1. **Super Admin** - System-wide control, all data, all regions
-2. **Republic Admin** - Statistics, regional KPIs, monitoring
-3. **Region Admin (Viloyat)** - Regional management and oversight
-4. **District Admin (Tuman)** - District-level data and management
-5. **Neighborhood Leader (Mahalla Yetakchisi)** - Local youth management
-6. **Youth (Yosh)** - Personal cabinet access
-7. **Employer (Ish Beruvchi)** - Job postings and management
-8. **Partner (Hamkor)** - Grants, courses, projects management
-
-## 📊 Core Modules
-
-### 1. Youth Registry (Yoshlar Reestri)
-- Personal information, JSHSHIR, address
-- Education level tracking
-- Employment status
-- Social status (student, unemployed, entrepreneur, migrant, disabled, low-income)
-- AI-powered profiling
-
-### 2. Problem Management (Muammolar)
-- Categories: Unemployment, Housing, Credit, Education, Health, Documents, Migration
-- Status tracking: New, In Progress, Resolved, Cancelled
-- File attachments: Photo, Video, PDF
-- AI-powered priority assignment
-
-### 3. Employment Module (Bandlik)
-- Job listings with AI matching
-- Applicant tracking
-- Regional and salary filtering
-
-### 4. Education & Courses
-- IT, Language, Vocational training courses
-- QR-based certificates
-- PDF export capability
-
-### 5. Grants & Entrepreneurship
-- Grant management and applications
-- Online application submission
-- Entrepreneurship support
-
-### 6. Events & Training
-- Event calendar
-- QR check-in system
-- Live attendance statistics
-
-### 7. Task Management
-- Task creation and assignment
-- Deadline tracking
-- Status workflow: New → In Progress → Review → Done
-
-### 8. KPI Dashboard
-- Region, District, Neighborhood-level KPIs
-- Formula constructor for custom metrics
-- Real-time tracking
-
-### 9. AI Assistant
-- Multi-language support (Uzbek, Russian, English)
-- Problem forecasting
-- Unemployment prediction
-- Migration trend analysis
-- Personalized recommendations
-
-### 10. Omnichannel Support
-- Web platform
-- Mobile app (iOS/Android)
-- Telegram Bot
-- Call Center integration
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 20+
-- Docker & Docker Compose
+- Node.js >= 20
 - PostgreSQL 16
-- Redis
-- Flutter SDK (for mobile development)
+- Redis 7
+- pnpm
 
-### Local Development Setup
+### 2. O'rnatish
 
 ```bash
-# Clone the repository
-git clone https://github.com/Doniyorbek2000/Yoshlar-360.git
+git clone <repo-url> yoshlar-360
 cd yoshlar-360
-
-# Install dependencies
-npm install
-
-# Setup environment variables
-cp .env.example .env.local
-
-# Start development environment with Docker
-docker-compose -f docker-compose.yml up -d
-
-# Run database migrations
-npm run db:migrate
-
-# Start all applications
-npm run dev
+pnpm install
+cp .env.example apps/backend/.env
 ```
 
-### Available Scripts
+### 3. Database sozlash
 
 ```bash
-# Development
-npm run dev                    # Start all apps in dev mode
-npm run dev:backend          # Backend only
-npm run dev:admin            # Admin panel only
-npm run dev:mobile           # Flutter dev
+# Docker orqali PostgreSQL va Redis
+docker-compose up -d postgres redis
 
-# Testing
-npm run test                 # Run all tests
-npm run test:unit            # Unit tests
-npm run test:integration     # Integration tests
-npm run test:e2e             # End-to-end tests
-npm run test:coverage        # Coverage report
+# Migration
+cd apps/backend
+npx prisma migrate dev --name init
 
-# Database
-npm run db:migrate           # Run migrations
-npm run db:seed              # Seed sample data
-npm run db:reset             # Reset database (dev only)
+# Prisma Client
+npx prisma generate
 
-# Build & Deployment
-npm run build                # Build all apps
-npm run build:backend        # Backend build
-npm run build:admin          # Admin build
-
-# DevOps
-docker-compose up -d         # Start infrastructure
-docker-compose down          # Stop infrastructure
-npm run docker:build         # Build all Docker images
+# Seed data
+npx ts-node prisma/seed.ts
 ```
 
-## 🔌 API Documentation
+### 4. Development server
 
-Full API documentation is available in Swagger format at:
+```bash
+# Backend (port 3000)
+cd apps/backend && pnpm dev
 
+# Frontend (port 3001)
+cd apps/web && pnpm dev
+
+# Bot
+cd apps/bot && pnpm dev
 ```
-http://localhost:3000/api/docs
+
+### 5. Kirish
+
+- Admin Panel: http://localhost:3001
+- API: http://localhost:3000/api
+- Swagger Docs: http://localhost:3000/api/docs
+
+### Demo accountlar
+
+| Rol | Email | Parol |
+|-----|-------|-------|
+| Super Admin | admin@yoshlar360.uz | Admin12345 |
+| Viloyat Admin | region@yoshlar360.uz | Region12345 |
+| Tuman Admin | district@yoshlar360.uz | District12345 |
+| Mahalla Yetakchisi | mahalla@yoshlar360.uz | Mahalla12345 |
+| Yoshlar | youth@yoshlar360.uz | Youth12345 |
+
+## Production (Docker)
+
+```bash
+docker-compose up -d --build
+docker-compose logs -f
 ```
 
-## 📱 Platform Capabilities
+### Servicelar
 
-### Web Admin Dashboard
-- User and role management
-- Youth registry management
-- Employment and education tracking
-- KPI monitoring and reporting
-- Grant and event management
-- AI analytics and forecasting
+| Service | Port |
+|---------|------|
+| API | 3000 |
+| Web | 3001 |
+| PostgreSQL | 5432 |
+| Redis | 6379 |
+| Nginx | 80/443 |
 
-### Mobile Application (iOS/Android)
-- Youth profile and personal cabinet
-- Job search and applications
-- Course discovery
-- Problem reporting
-- Offline mode support
-- Push notifications
+## Environment variables
 
-### Telegram Bot
-- Profile information
-- Problem reporting
-- Job alerts
-- Course recommendations
-- Admin notifications
+```env
+NODE_ENV=development
+API_PORT=3000
+DATABASE_URL=postgresql://yoshlar:yoshlar360@localhost:5432/yoshlar_360_db
+REDIS_HOST=localhost
+REDIS_PORT=6379
+JWT_SECRET=your-secret-key
+JWT_REFRESH_SECRET=your-refresh-secret-key
+CORS_ORIGINS=http://localhost:3001
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+```
 
-## 🎯 Performance & Scalability
+## API Modullar
 
-- **Capacity**: 100,000+ youth records
-- **Concurrent Users**: 10,000+
-- **Multi-Region Support**: Horizontal scaling ready
-- **Caching Strategy**: Redis with intelligent invalidation
-- **CDN**: Global content delivery
-- **Database Replication**: Read replicas for reporting
+| Modul | Endpoint | Tavsif |
+|-------|----------|--------|
+| Auth | /api/auth | Login, Register, Refresh, Logout, Me |
+| Users | /api/users | Foydalanuvchilar CRUD |
+| Youth | /api/youth | Yoshlar profili CRUD |
+| Appeals | /api/appeals | Murojaatlar boshqaruvi |
+| Problems | /api/problems | Muammolar boshqaruvi |
+| Tasks | /api/tasks | Vazifalar boshqaruvi |
+| KPI | /api/kpi | KPI ko'rsatkichlari |
+| Reports | /api/reports | Hisobotlar |
+| Imports | /api/imports | Excel import |
+| Notifications | /api/notifications | Bildirishnomalar |
+| Dashboard | /api/dashboard | Statistika |
+| Audit Log | /api/audit-logs | Audit loglar |
+| Regions | /api/regions | Viloyat/Tuman/Mahalla |
 
-## 📈 Analytics & Reporting
+## Telegram Bot
 
-- Real-time dashboards
-- Interactive charts (Daily, Weekly, Monthly, Yearly)
-- Heatmaps for geographic distribution
-- Automated report generation (PDF, Excel, CSV)
-- GIS integration with Mapbox
-- Export functionality
+1. BotFather orqali bot yarating
+2. TELEGRAM_BOT_TOKEN ni .env ga qo'shing
+3. Bot imkoniyatlari:
+   - Til tanlash (O'zbek / Rus)
+   - Telefon raqam orqali ro'yxatdan o'tish
+   - Viloyat / Tuman / Mahalla tanlash
+   - Murojaat yuborish
+   - Murojaatlar holatini tekshirish
+   - Profil ko'rish
 
-## 🔔 Notifications
+## Xavfsizlik
 
-- Push notifications (Web & Mobile)
-- SMS alerts
-- Telegram notifications
-- Email communications
-- Scheduled notifications
+- Argon2 password hashing
+- JWT Access Token (15 daqiqa)
+- Refresh Token Rotation (7 kun)
+- RBAC/ABAC permission system
+- Rate limiting (ThrottlerGuard)
+- Helmet security headers
+- CORS konfiguratsiya
+- Input validation (class-validator)
+- SQL injection himoyasi (Prisma ORM)
+- Audit log
 
-## 📁 File Storage
+## Litsenziya
 
-Supported formats:
-- Documents: PDF, DOCX, XLSX
-- Images: JPG, PNG
-- Video: MP4
-
-Storage backend: MinIO / AWS S3
-
-## 🧪 Testing
-
-- **Unit Tests**: Jest for backend and frontend
-- **Integration Tests**: Database and API integration
-- **E2E Tests**: Cypress for web, Flutter testing for mobile
-- **Test Coverage**: Minimum 80% target
-
-## 📊 Monitoring & Observability
-
-- **Metrics**: Prometheus
-- **Visualization**: Grafana dashboards
-- **Logs**: Loki for centralized logging
-- **Error Tracking**: Sentry integration
-- **Alerting**: Real-time notifications for critical issues
-
-## 🛡️ Compliance & Standards
-
-- ✅ OWASP Top 10 protection
-- ✅ GDPR-style privacy controls
-- ✅ Government data security standards
-- ✅ Uzbek language localization
-- ✅ Multi-language support (UZ, RU, EN)
-
-## 📄 License
-
-Proprietary - Government of Uzbekistan
-
-## 🤝 Contributing
-
-Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-## 📞 Support
-
-For issues and questions, please create a GitHub issue or contact the development team.
-
----
-
-**Status**: Under Active Development
-**Last Updated**: June 2026
-**Team**: Youth Affairs Digital Transformation Initiative
+PROPRIETARY - Yoshlar-360 Team
