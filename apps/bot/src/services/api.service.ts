@@ -268,6 +268,7 @@ class ApiService {
   async sendBroadcast(payload: {
     target: string;
     targetId?: number;
+    targetRole?: string;
     text: string;
     fileUrl?: string;
     senderId: number;

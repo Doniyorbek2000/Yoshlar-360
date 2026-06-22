@@ -4,6 +4,7 @@ import { CreateYouthDto } from './dto/create-youth.dto';
 import { FilterYouthDto } from './dto/filter-youth.dto';
 import { PaginatedResult } from '../../common/dto/pagination.dto';
 import { buildRegionFilter } from '../../common/utils/region-filter.util';
+import { Role, RiskLevel } from '@prisma/client';
 import * as argon2 from 'argon2';
 
 @Injectable()
@@ -82,7 +83,7 @@ export class YouthService {
         email,
         phone: dto.phone,
         passwordHash,
-        role: 'YOUTH',
+        role: Role.YOUTH,
         regionId: dto.regionId,
         districtId: dto.districtId,
         mahallaId: dto.mahallaId,
@@ -96,7 +97,7 @@ export class YouthService {
             socialStatus: dto.socialStatus,
             address: dto.address,
             interests: dto.interests,
-            riskLevel: dto.riskLevel || 'LOW',
+            riskLevel: dto.riskLevel || RiskLevel.LOW,
           },
         },
       },

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { NotificationType } from '@prisma/client';
 
@@ -9,18 +9,21 @@ export class BroadcastService {
   async send(payload: {
     target: string;
     targetId?: number;
+    targetRole?: string;
     text: string;
     fileUrl?: string;
     senderId: number;
   }) {
-    const where: any = { isActive: true, telegramId: { not: null } };
+    const where: any = { isActive: true };
 
     switch (payload.target) {
       case 'ALL':
         break;
       case 'ROLE':
-        if (payload.targetId) {
-          // targetId is not used for role, but we may pass role name in text
+        if (payload.targetRole) {
+          where.role = payload.targetRole;
+        } else {
+          throw new BadRequestException('targetRole is required when target is ROLE');
         }
         break;
       case 'REGION':
@@ -32,6 +35,8 @@ export class BroadcastService {
       case 'MAHALLA':
         if (payload.targetId) where.mahallaId = payload.targetId;
         break;
+      default:
+        throw new BadRequestException(`Invalid target: ${payload.target}`);
     }
 
     const users = await this.prisma.user.findMany({
@@ -39,7 +44,11 @@ export class BroadcastService {
       select: { id: true, telegramId: true },
     });
 
-    await this.prisma.notification.createMany({
+    if (users.length === 0) {
+      return { sent: 0, failed: 0 };
+    }
+
+    const result = await this.prisma.notification.createMany({
       data: users.map((u) => ({
         userId: u.id,
         title: 'Broadcast',
@@ -48,6 +57,6 @@ export class BroadcastService {
       })),
     });
 
-    return { sent: users.length, failed: 0 };
+    return { sent: result.count, failed: users.length - result.count };
   }
 }

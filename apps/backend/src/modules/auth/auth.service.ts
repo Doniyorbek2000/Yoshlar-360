@@ -175,7 +175,7 @@ export class AuthService {
         email,
         phone: data.phone,
         passwordHash,
-        role: 'YOUTH',
+        role: Role.YOUTH,
         telegramId: data.telegramId,
         regionId: data.regionId || null,
         districtId: data.districtId || null,

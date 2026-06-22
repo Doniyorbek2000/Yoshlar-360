@@ -73,10 +73,10 @@ export function registerBroadcastScene(bot: Telegraf<BotContext>) {
   });
 
   // Confirm broadcast
-  bot.action('yes', async (ctx) => {
+  bot.action('broadcast_yes', async (ctx) => {
     const userId = ctx.from!.id;
     const session = await sessionService.getSession(userId);
-    if (session.step !== 'broadcast_confirm') return;
+    if (session.step !== 'broadcast_confirm') return ctx.answerCbQuery();
 
     await ctx.answerCbQuery();
     const lang = await sessionService.getLanguage(userId);
@@ -91,6 +91,7 @@ export function registerBroadcastScene(bot: Telegraf<BotContext>) {
     const result = await apiService.sendBroadcast({
       target: session.broadcastTarget!,
       targetId: session.broadcastTargetId,
+      targetRole: (session as any).broadcastRoleValue,
       text: session.broadcastText!,
       fileUrl: session.broadcastFileId,
       senderId: user.id,
@@ -106,10 +107,10 @@ export function registerBroadcastScene(bot: Telegraf<BotContext>) {
     await ctx.reply(t(lang, 'broadcastSent', { sent: result.sent, failed: result.failed }));
   });
 
-  bot.action('no', async (ctx) => {
+  bot.action('broadcast_no', async (ctx) => {
     const userId = ctx.from!.id;
     const session = await sessionService.getSession(userId);
-    if (session.step !== 'broadcast_confirm') return;
+    if (session.step !== 'broadcast_confirm') return ctx.answerCbQuery();
 
     session.step = undefined;
     session.broadcastTarget = undefined;
@@ -143,7 +144,7 @@ export async function handleBroadcastText(ctx: BotContext, session: SessionData,
     const targetLabel = session.broadcastTarget || 'ALL';
     await ctx.reply(
       t(lang, 'broadcastConfirm', { target: targetLabel, text: text.slice(0, 200) }),
-      yesNoKeyboard(lang),
+      yesNoKeyboard(lang, 'broadcast'),
     );
     return true;
   }

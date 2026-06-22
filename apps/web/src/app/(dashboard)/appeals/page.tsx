@@ -49,7 +49,10 @@ export default function AppealsPage() {
         setData(d.data || []);
         setMeta(d.meta || { total: 0, page: 1, limit: 20, totalPages: 0 });
       }
-    } catch { setData([]); }
+    } catch {
+      setData([]);
+      toast.error('Murojaatlarni yuklashda xatolik');
+    }
     setLoading(false);
   };
 

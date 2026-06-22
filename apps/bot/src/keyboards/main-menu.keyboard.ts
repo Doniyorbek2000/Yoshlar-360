@@ -30,9 +30,11 @@ export function confirmKeyboard(lang: string) {
   ]);
 }
 
-export function yesNoKeyboard(lang: string) {
+export function yesNoKeyboard(lang: string, prefix = '') {
+  const yesAction = prefix ? `${prefix}_yes` : 'yes';
+  const noAction = prefix ? `${prefix}_no` : 'no';
   return Markup.inlineKeyboard([
-    [Markup.button.callback(t(lang, 'yes'), 'yes'), Markup.button.callback(t(lang, 'no'), 'no')],
+    [Markup.button.callback(t(lang, 'yes'), yesAction), Markup.button.callback(t(lang, 'no'), noAction)],
   ]);
 }
 
