@@ -9,16 +9,20 @@ export class RegionsService {
     return this.prisma.region.findMany({ orderBy: { nameUz: 'asc' } });
   }
 
-  async getDistricts(regionId: number) {
+  async getDistricts(regionId?: number) {
+    const where: any = {};
+    if (regionId) where.regionId = regionId;
     return this.prisma.district.findMany({
-      where: { regionId },
+      where,
       orderBy: { nameUz: 'asc' },
     });
   }
 
-  async getMahallas(districtId: number) {
+  async getMahallas(districtId?: number) {
+    const where: any = {};
+    if (districtId) where.districtId = districtId;
     return this.prisma.mahalla.findMany({
-      where: { districtId },
+      where,
       orderBy: { nameUz: 'asc' },
     });
   }

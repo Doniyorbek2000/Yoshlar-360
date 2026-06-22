@@ -31,6 +31,34 @@ export class AuthController {
     return this.authService.register(dto, role);
   }
 
+  @Post('telegram/verify')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Telegram orqali telefon tasdiqlash' })
+  telegramVerify(@Body() body: { phone: string; telegramId: string }) {
+    return this.authService.telegramVerify(body.phone, body.telegramId);
+  }
+
+  @Post('telegram/register')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Telegram orqali ro\'yxatdan o\'tish' })
+  telegramRegister(@Body() body: {
+    fullName: string;
+    phone: string;
+    telegramId: string;
+    birthDate?: string;
+    gender?: string;
+    regionId?: number;
+    districtId?: number;
+    mahallaId?: number;
+    address?: string;
+    education?: string;
+    employmentStatus?: string;
+    socialStatus?: string;
+    interests?: string;
+  }) {
+    return this.authService.telegramRegister(body);
+  }
+
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Tokenni yangilash' })

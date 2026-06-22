@@ -43,6 +43,26 @@ export class TasksService {
     return new PaginatedResult(data, total, page, limit);
   }
 
+  async findByUser(userId: number, page = 1, limit = 5) {
+    const where = {
+      OR: [{ assignedToId: userId }, { createdById: userId }],
+    };
+    const [data, total] = await Promise.all([
+      this.prisma.task.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          assignedTo: { select: { fullName: true } },
+          createdBy: { select: { fullName: true } },
+        },
+      }),
+      this.prisma.task.count({ where }),
+    ]);
+    return { data, total };
+  }
+
   async findOne(id: number) {
     const task = await this.prisma.task.findUnique({
       where: { id },

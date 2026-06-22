@@ -45,6 +45,27 @@ export class AppealsService {
     return new PaginatedResult(data, total, page, limit);
   }
 
+  async findByUser(userId: number, page = 1, limit = 5) {
+    const where = { youthId: userId };
+    const [data, total] = await Promise.all([
+      this.prisma.appeal.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          assignedTo: { select: { fullName: true } },
+          region: { select: { nameUz: true, nameRu: true } },
+          district: { select: { nameUz: true, nameRu: true } },
+          mahalla: { select: { nameUz: true, nameRu: true } },
+          comments: true,
+        },
+      }),
+      this.prisma.appeal.count({ where }),
+    ]);
+    return { data, total };
+  }
+
   async findOne(id: number) {
     const appeal = await this.prisma.appeal.findUnique({
       where: { id },

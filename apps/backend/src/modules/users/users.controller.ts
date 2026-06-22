@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Param,
   Body,
@@ -35,6 +36,12 @@ export class UsersController {
     return this.usersService.findAll(filter, user);
   }
 
+  @Get('telegram/:telegramId')
+  @ApiOperation({ summary: 'Telegram ID bo\'yicha foydalanuvchi' })
+  findByTelegramId(@Param('telegramId') telegramId: string) {
+    return this.usersService.findByTelegramId(telegramId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Foydalanuvchi ma\'lumotlari' })
   findOne(@Param('id', ParseIntPipe) id: number) {
@@ -52,6 +59,12 @@ export class UsersController {
   @Roles(Role.SUPER_ADMIN, Role.REPUBLIC_ADMIN)
   @ApiOperation({ summary: 'Foydalanuvchini tahrirlash' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
+    return this.usersService.update(id, dto);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Foydalanuvchi profilini qisman yangilash' })
+  patchUpdate(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
     return this.usersService.update(id, dto);
   }
 

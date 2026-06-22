@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Param,
   Body,
   Query,
@@ -32,6 +33,16 @@ export class AppealsController {
   @ApiOperation({ summary: 'Murojaatlar ro\'yxati' })
   findAll(@Query() filter: FilterAppealDto, @CurrentUser() user: any) {
     return this.appealsService.findAll(filter, user);
+  }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Foydalanuvchi murojaatlari' })
+  findByUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.appealsService.findByUser(userId, parseInt(page || '1'), parseInt(limit || '5'));
   }
 
   @Get(':id')
@@ -87,5 +98,48 @@ export class AppealsController {
     @Body() dto: AddCommentDto,
   ) {
     return this.appealsService.addComment(id, userId, dto.text);
+  }
+
+  @Post(':id/reply')
+  @Roles(
+    Role.SUPER_ADMIN,
+    Role.REPUBLIC_ADMIN,
+    Role.REGION_ADMIN,
+    Role.DISTRICT_ADMIN,
+    Role.MAHALLA_LEADER,
+    Role.MODERATOR,
+  )
+  @ApiOperation({ summary: 'Murojaatga javob yozish' })
+  reply(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { userId: number; text: string },
+  ) {
+    return this.appealsService.addComment(id, body.userId, body.text);
+  }
+
+  @Post(':id/rate')
+  @ApiOperation({ summary: 'Murojaatni baholash' })
+  rate(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { rating: number },
+  ) {
+    return { appealId: id, rating: body.rating };
+  }
+
+  @Patch(':id/status')
+  @Roles(
+    Role.SUPER_ADMIN,
+    Role.REPUBLIC_ADMIN,
+    Role.REGION_ADMIN,
+    Role.DISTRICT_ADMIN,
+    Role.MAHALLA_LEADER,
+    Role.MODERATOR,
+  )
+  @ApiOperation({ summary: 'Murojaat statusini o\'zgartirish (PATCH)' })
+  patchStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateAppealStatusDto,
+  ) {
+    return this.appealsService.updateStatus(id, dto.status);
   }
 }

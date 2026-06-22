@@ -27,6 +27,19 @@ export class KpiService {
     });
   }
 
+  async getUserKpi(userId: number) {
+    const records = await this.prisma.kpiRecord.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+    const score = records.reduce((sum, r) => sum + r.value, 0);
+    const appealsResolved = records.filter((r) => r.metric === 'appeals_resolved').reduce((s, r) => s + r.value, 0);
+    const tasksDone = records.filter((r) => r.metric === 'tasks_done').reduce((s, r) => s + r.value, 0);
+    const youthEngaged = records.filter((r) => r.metric === 'youth_engaged').reduce((s, r) => s + r.value, 0);
+    return { score: Math.min(score, 100), appeals: appealsResolved, tasks: tasksDone, youth: youthEngaged, rank: 0 };
+  }
+
   async create(dto: CreateKpiDto) {
     return this.prisma.kpiRecord.create({ data: dto });
   }

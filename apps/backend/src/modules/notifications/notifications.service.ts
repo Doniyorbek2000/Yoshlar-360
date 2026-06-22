@@ -14,6 +14,20 @@ export class NotificationsService {
     });
   }
 
+  async getUserNotificationsPaginated(userId: number, page = 1, limit = 10) {
+    const where = { userId };
+    const [data, total] = await Promise.all([
+      this.prisma.notification.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.notification.count({ where }),
+    ]);
+    return { data, total };
+  }
+
   async getUnreadCount(userId: number) {
     return this.prisma.notification.count({
       where: { userId, isRead: false },

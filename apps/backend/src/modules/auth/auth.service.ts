@@ -122,6 +122,83 @@ export class AuthService {
     return result;
   }
 
+  async telegramVerify(phone: string, telegramId: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ phone }, { telegramId }] },
+      include: { region: true, district: true, mahalla: true, youthProfile: true },
+    });
+
+    if (!user) return null;
+
+    if (!user.telegramId) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { telegramId },
+      });
+    }
+
+    const { passwordHash, ...result } = user;
+    return result;
+  }
+
+  async telegramRegister(data: {
+    fullName: string;
+    phone: string;
+    telegramId: string;
+    birthDate?: string;
+    gender?: string;
+    regionId?: number;
+    districtId?: number;
+    mahallaId?: number;
+    address?: string;
+    education?: string;
+    employmentStatus?: string;
+    socialStatus?: string;
+    interests?: string;
+  }) {
+    const existingPhone = await this.prisma.user.findUnique({ where: { phone: data.phone } });
+    if (existingPhone) {
+      throw new ConflictException('Bu telefon raqam allaqachon ro\'yxatdan o\'tgan');
+    }
+
+    const existingTg = await this.prisma.user.findUnique({ where: { telegramId: data.telegramId } });
+    if (existingTg) {
+      throw new ConflictException('Bu Telegram akkaunt allaqachon ro\'yxatdan o\'tgan');
+    }
+
+    const email = `tg_${data.telegramId}@yoshlar360.uz`;
+    const passwordHash = await argon2.hash('TgUser' + data.telegramId);
+
+    const user = await this.prisma.user.create({
+      data: {
+        fullName: data.fullName,
+        email,
+        phone: data.phone,
+        passwordHash,
+        role: 'YOUTH',
+        telegramId: data.telegramId,
+        regionId: data.regionId || null,
+        districtId: data.districtId || null,
+        mahallaId: data.mahallaId || null,
+        youthProfile: {
+          create: {
+            birthDate: data.birthDate ? new Date(data.birthDate.split('.').reverse().join('-')) : null,
+            gender: data.gender as any || null,
+            education: data.education as any || null,
+            employmentStatus: data.employmentStatus as any || null,
+            socialStatus: data.socialStatus as any || null,
+            address: data.address || null,
+            interests: data.interests || null,
+          },
+        },
+      },
+      include: { region: true, district: true, mahalla: true, youthProfile: true },
+    });
+
+    const { passwordHash: _, ...result } = user;
+    return result;
+  }
+
   private async generateTokens(userId: number, email: string, role: Role) {
     const payload = { sub: userId, email, role };
 

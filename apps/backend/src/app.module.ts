@@ -17,6 +17,8 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { AuditLogModule } from './modules/audit-log/audit-log.module';
 import { RegionsModule } from './modules/regions/regions.module';
+import { BroadcastModule } from './modules/broadcast/broadcast.module';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { RegionsModule } from './modules/regions/regions.module';
     DashboardModule,
     AuditLogModule,
     RegionsModule,
+    BroadcastModule,
+    UploadModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

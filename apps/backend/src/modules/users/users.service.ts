@@ -62,6 +62,16 @@ export class UsersService {
     return result;
   }
 
+  async findByTelegramId(telegramId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { telegramId },
+      include: { region: true, district: true, mahalla: true, youthProfile: true },
+    });
+    if (!user) throw new NotFoundException('Foydalanuvchi topilmadi');
+    const { passwordHash, ...result } = user;
+    return result;
+  }
+
   async create(dto: CreateUserDto) {
     const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
     if (existing) throw new ConflictException('Bu email allaqachon mavjud');

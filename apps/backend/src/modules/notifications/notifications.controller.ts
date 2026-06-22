@@ -5,6 +5,7 @@ import {
   Post,
   Param,
   Body,
+  Query,
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
@@ -33,6 +34,26 @@ export class NotificationsController {
   @ApiOperation({ summary: 'O\'qilmagan bildirishnomalar soni' })
   unreadCount(@CurrentUser('id') userId: number) {
     return this.notificationsService.getUnreadCount(userId);
+  }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Foydalanuvchi bildirishnomalari (bot uchun)' })
+  findByUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.notificationsService.getUserNotificationsPaginated(
+      userId,
+      parseInt(page || '1'),
+      parseInt(limit || '10'),
+    );
+  }
+
+  @Post('user/:userId/read-all')
+  @ApiOperation({ summary: 'Foydalanuvchi bildirishnomalarini o\'qildi' })
+  markAllReadByUser(@Param('userId', ParseIntPipe) userId: number) {
+    return this.notificationsService.markAllAsRead(userId);
   }
 
   @Put(':id/read')

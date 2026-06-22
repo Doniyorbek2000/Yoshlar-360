@@ -11,8 +11,14 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 export class DashboardController {
   constructor(private dashboardService: DashboardService) {}
 
-  @Get('summary')
+  @Get()
   @ApiOperation({ summary: 'Asosiy statistika' })
+  getDashboard(@CurrentUser() user: any) {
+    return this.dashboardService.getSummary(user);
+  }
+
+  @Get('summary')
+  @ApiOperation({ summary: 'Asosiy statistika (alias)' })
   getSummary(@CurrentUser() user: any) {
     return this.dashboardService.getSummary(user);
   }

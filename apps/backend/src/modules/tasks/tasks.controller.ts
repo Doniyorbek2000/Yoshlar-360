@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Param,
   Body,
@@ -31,6 +32,16 @@ export class TasksController {
   @ApiOperation({ summary: 'Vazifalar ro\'yxati' })
   findAll(@Query() filter: FilterTaskDto, @CurrentUser() user: any) {
     return this.tasksService.findAll(filter, user);
+  }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Foydalanuvchi vazifalari' })
+  findByUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.tasksService.findByUser(userId, parseInt(page || '1'), parseInt(limit || '5'));
   }
 
   @Get('overdue')
@@ -77,6 +88,15 @@ export class TasksController {
   @Put(':id/status')
   @ApiOperation({ summary: 'Vazifa statusini o\'zgartirish' })
   updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('status') status: TaskStatus,
+  ) {
+    return this.tasksService.updateStatus(id, status);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Vazifa statusini o\'zgartirish (PATCH)' })
+  patchStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body('status') status: TaskStatus,
   ) {

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { KpiService } from './kpi.service';
 import { CreateKpiDto } from './dto/create-kpi.dto';
@@ -20,6 +20,12 @@ export class KpiController {
   @ApiOperation({ summary: 'KPI ko\'rsatkichlari' })
   findAll(@Query() filter: FilterKpiDto, @CurrentUser() user: any) {
     return this.kpiService.findAll(filter, user);
+  }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Foydalanuvchi KPI ko\'rsatkichlari' })
+  findByUser(@Param('userId', ParseIntPipe) userId: number) {
+    return this.kpiService.getUserKpi(userId);
   }
 
   @Post()
