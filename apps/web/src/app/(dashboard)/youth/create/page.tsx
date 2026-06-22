@@ -47,7 +47,7 @@ export default function CreateYouthPage() {
     setLoading(false);
   };
 
-  const inputClass = "w-full px-4 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary-500";
+  const inputClass = "w-full px-4 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500";
   const update = (field: string, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
 
   return (
@@ -154,7 +154,7 @@ export default function CreateYouthPage() {
           <input value={form.interests} onChange={(e) => update('interests', e.target.value)} className={inputClass} />
         </div>
         <div className="flex gap-3 pt-4">
-          <button type="submit" disabled={loading} className="px-6 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50">
+          <button type="submit" disabled={loading} className="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50">
             {loading ? 'Saqlanmoqda...' : 'Saqlash'}
           </button>
           <button type="button" onClick={() => router.back()} className="px-6 py-2.5 border rounded-lg text-sm font-medium hover:bg-gray-50">
