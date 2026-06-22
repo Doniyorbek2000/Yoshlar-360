@@ -194,6 +194,27 @@
   "broadcastSent": "✅ Xabar yuborildi!\n\n📬 Yuborildi: {sent}\n❌ Yetmadi: {failed}",
   "broadcastCancelled": "❌ Xabar yuborish bekor qilindi.",
 
+  "menuEvents": "📅 Tadbirlar",
+  "menuSurveys": "📝 So'rovnomalar",
+
+  "eventsTitle": "📅 Tadbirlar ({count} ta):",
+  "noEvents": "📭 Hozircha tadbirlar yo'q.",
+  "eventDetail": "📅 Tadbir #{id}\n\n📝 {title}\n📄 {description}\n\n📂 Turi: {type}\n📊 Holat: {status}\n📅 Boshlanishi: {startDate}\n📅 Tugashi: {endDate}\n📍 Joy: {location}\n👥 Ishtirokchilar: {participants}\n👤 Tashkilotchi: {organizer}\n📍 Hudud: {region}",
+  "eventNotFound": "❌ Tadbir topilmadi.",
+  "eventRegister": "✅ Ro'yxatdan o'tish",
+  "eventRegistered": "✅ Siz tadbirga ro'yxatdan o'tdingiz!",
+  "eventRegisterFailed": "❌ Ro'yxatdan o'tishda xatolik. Tadbir to'lgan yoki yakunlangan bo'lishi mumkin.",
+
+  "surveysTitle": "📝 So'rovnomalar ({count} ta):",
+  "noSurveys": "📭 Faol so'rovnomalar yo'q.",
+  "surveyDetail": "📝 So'rovnoma #{id}\n\n📋 {title}\n📄 {description}\n\n📊 Savollar soni: {questions}\n📅 Tugashi: {endDate}",
+  "surveyNotFound": "❌ So'rovnoma topilmadi.",
+  "surveyStart": "📝 Boshlash",
+  "surveyQuestion": "📝 Savol {current}/{total}:\n\n{text}",
+  "surveyCompleted": "✅ So'rovnomaga javob berganingiz uchun rahmat!",
+  "surveyFailed": "❌ Javoblarni yuborishda xatolik.",
+  "surveyAlreadyCompleted": "✅ Siz allaqachon bu so'rovnomaga javob bergansiz.",
+
   "back": "⬅️ Orqaga",
   "cancel": "❌ Bekor qilish",
   "skip": "⏭ O'tkazish",

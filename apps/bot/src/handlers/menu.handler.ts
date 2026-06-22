@@ -12,6 +12,7 @@ import { handleProfileEditText } from '../scenes/profile-edit.scene';
 import { handleProblemText, handleProblemPhoto, handleProblemLocation } from '../scenes/problem-create.scene';
 import { handleBroadcastText } from '../scenes/broadcast.scene';
 import { handleAdminText } from './admin.handler';
+import { handleSurveyText } from './surveys.handler';
 
 export function registerMenuHandler(bot: Telegraf<BotContext>) {
   bot.command('menu', async (ctx) => {
@@ -85,6 +86,9 @@ export function registerMenuHandler(bot: Telegraf<BotContext>) {
     if (session.step?.startsWith('broadcast_')) {
       if (await handleBroadcastText(ctx, session, lang)) return;
     }
+    if (session.step?.startsWith('survey_')) {
+      if (await handleSurveyText(ctx, session, lang)) return;
+    }
     if (session.step?.startsWith('admin_')) {
       if (await handleAdminText(ctx, session, lang)) return;
     }
@@ -126,6 +130,18 @@ export function registerMenuHandler(bot: Telegraf<BotContext>) {
     if (text === t(lang, 'menuNotifications')) {
       const { showNotifications } = require('./notifications.handler');
       await showNotifications(ctx);
+      return;
+    }
+
+    if (text === t(lang, 'menuEvents')) {
+      const { showEvents } = require('./events.handler');
+      await showEvents(ctx);
+      return;
+    }
+
+    if (text === t(lang, 'menuSurveys')) {
+      const { showSurveys } = require('./surveys.handler');
+      await showSurveys(ctx);
       return;
     }
 

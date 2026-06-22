@@ -15,6 +15,8 @@ import { registerAdminHandler } from './handlers/admin.handler';
 import { registerTasksHandler } from './handlers/tasks.handler';
 import { registerNotificationsHandler } from './handlers/notifications.handler';
 import { registerSettingsHandler } from './handlers/settings.handler';
+import { registerEventsHandler } from './handlers/events.handler';
+import { registerSurveysHandler } from './handlers/surveys.handler';
 
 // Scenes
 import { registerRegistrationScene } from './scenes/registration.scene';
@@ -46,6 +48,8 @@ registerAdminHandler(bot);
 registerTasksHandler(bot);
 registerNotificationsHandler(bot);
 registerSettingsHandler(bot);
+registerEventsHandler(bot);
+registerSurveysHandler(bot);
 
 // Menu handler must be registered last (it has the catch-all text handler)
 registerMenuHandler(bot);

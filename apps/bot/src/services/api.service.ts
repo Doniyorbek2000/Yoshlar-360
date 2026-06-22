@@ -299,6 +299,64 @@ class ApiService {
     } catch {}
   }
 
+  // Events
+  async getEvents(page = 1, limit = 5): Promise<{ data: any[]; total: number }> {
+    try {
+      const { data } = await this.client.get<ApiResponse<any>>(`/events?page=${page}&limit=${limit}&status=UPCOMING`);
+      const d = data.data;
+      return { data: d.data || d || [], total: d.total || 0 };
+    } catch {
+      return { data: [], total: 0 };
+    }
+  }
+
+  async getEventById(id: number): Promise<any | null> {
+    try {
+      const { data } = await this.client.get<ApiResponse<any>>(`/events/${id}`);
+      return data.data;
+    } catch {
+      return null;
+    }
+  }
+
+  async registerForEvent(eventId: number): Promise<boolean> {
+    try {
+      await this.client.post(`/events/${eventId}/register`);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Surveys
+  async getActiveSurveys(page = 1): Promise<{ data: any[]; total: number }> {
+    try {
+      const { data } = await this.client.get<ApiResponse<any>>(`/surveys?page=${page}&limit=5&status=ACTIVE`);
+      const d = data.data;
+      return { data: d.data || d || [], total: d.total || 0 };
+    } catch {
+      return { data: [], total: 0 };
+    }
+  }
+
+  async getSurveyById(id: number): Promise<any | null> {
+    try {
+      const { data } = await this.client.get<ApiResponse<any>>(`/surveys/${id}`);
+      return data.data;
+    } catch {
+      return null;
+    }
+  }
+
+  async submitSurveyResponse(surveyId: number, answers: { questionId: number; value: string }[]): Promise<boolean> {
+    try {
+      await this.client.post(`/surveys/${surveyId}/respond`, { answers });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   // File upload
   async uploadFile(fileBuffer: Buffer, filename: string): Promise<string> {
     const FormData = require('form-data');

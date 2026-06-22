@@ -17,6 +17,7 @@ export function phoneKeyboard(lang: string) {
 export function youthMenuKeyboard(lang: string) {
   return Markup.keyboard([
     [t(lang, 'menuAppeal'), t(lang, 'menuMyAppeals')],
+    [t(lang, 'menuEvents'), t(lang, 'menuSurveys')],
     [t(lang, 'menuCheckStatus'), t(lang, 'menuProfile')],
     [t(lang, 'menuNews'), t(lang, 'menuNotifications')],
     [t(lang, 'menuContact'), t(lang, 'menuSettings')],

@@ -194,6 +194,27 @@
   "broadcastSent": "✅ Сообщение отправлено!\n\n📬 Отправлено: {sent}\n❌ Не доставлено: {failed}",
   "broadcastCancelled": "❌ Рассылка отменена.",
 
+  "menuEvents": "📅 Мероприятия",
+  "menuSurveys": "📝 Опросы",
+
+  "eventsTitle": "📅 Мероприятия ({count}):",
+  "noEvents": "📭 Мероприятий пока нет.",
+  "eventDetail": "📅 Мероприятие #{id}\n\n📝 {title}\n📄 {description}\n\n📂 Тип: {type}\n📊 Статус: {status}\n📅 Начало: {startDate}\n📅 Окончание: {endDate}\n📍 Место: {location}\n👥 Участники: {participants}\n👤 Организатор: {organizer}\n📍 Регион: {region}",
+  "eventNotFound": "❌ Мероприятие не найдено.",
+  "eventRegister": "✅ Зарегистрироваться",
+  "eventRegistered": "✅ Вы зарегистрировались на мероприятие!",
+  "eventRegisterFailed": "❌ Ошибка регистрации. Мероприятие может быть заполнено или завершено.",
+
+  "surveysTitle": "📝 Опросы ({count}):",
+  "noSurveys": "📭 Активных опросов нет.",
+  "surveyDetail": "📝 Опрос #{id}\n\n📋 {title}\n📄 {description}\n\n📊 Вопросов: {questions}\n📅 Окончание: {endDate}",
+  "surveyNotFound": "❌ Опрос не найден.",
+  "surveyStart": "📝 Начать",
+  "surveyQuestion": "📝 Вопрос {current}/{total}:\n\n{text}",
+  "surveyCompleted": "✅ Спасибо за участие в опросе!",
+  "surveyFailed": "❌ Ошибка отправки ответов.",
+  "surveyAlreadyCompleted": "✅ Вы уже отвечали на этот опрос.",
+
   "back": "⬅️ Назад",
   "cancel": "❌ Отмена",
   "skip": "⏭ Пропустить",
