@@ -97,6 +97,61 @@ enum NotificationType {
   TASK
   KPI
   BROADCAST
+  EVENT
+  SURVEY
+}
+
+enum EventStatus {
+  DRAFT
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum EventType {
+  SEMINAR
+  WORKSHOP
+  CONFERENCE
+  SPORT
+  CULTURAL
+  VOLUNTEERING
+  OTHER
+}
+
+enum QuestionType {
+  TEXT
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  RATING
+  NUMBER
+}
+
+enum SurveyStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+enum FileCategory {
+  DOCUMENT
+  IMAGE
+  VIDEO
+  REPORT
+  IMPORT
+  OTHER
+}
+
+enum SmsStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
 }
 
 model Region {
@@ -109,6 +164,8 @@ model Region {
   problems  Problem[]
   kpiRecords KpiRecord[]
   reports   Report[]
+  events    Event[]
+  surveys   Survey[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
@@ -127,6 +184,8 @@ model District {
   problems  Problem[]
   kpiRecords KpiRecord[]
   reports   Report[]
+  events    Event[]
+  surveys   Survey[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -182,6 +241,11 @@ model User {
   auditLogs       AuditLog[]
   refreshTokens   RefreshToken[]
   appealComments  AppealComment[]
+  organizedEvents    Event[]            @relation("EventOrganizer")
+  eventParticipations EventParticipant[]
+  createdSurveys     Survey[]           @relation("SurveyCreator")
+  surveyResponses    SurveyResponse[]
+  uploadedFiles      FileRecord[]       @relation("FileUploader")
 
   @@map("users")
 }
@@ -372,4 +436,134 @@ model RefreshToken {
   createdAt DateTime  @default(now())
 
   @@map("refresh_tokens")
+}
+
+model Event {
+  id              Int        @id @default(autoincrement())
+  title           String
+  description     String
+  type            EventType  @default(OTHER)
+  status          EventStatus @default(DRAFT)
+  startDate       DateTime
+  endDate         DateTime
+  location        String
+  maxParticipants Int?
+  imageUrl        String?
+  regionId        Int?
+  region          Region?    @relation(fields: [regionId], references: [id])
+  districtId      Int?
+  district        District?  @relation(fields: [districtId], references: [id])
+  organizerId     Int
+  organizer       User       @relation("EventOrganizer", fields: [organizerId], references: [id])
+  participants    EventParticipant[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  @@map("events")
+}
+
+model EventParticipant {
+  id           Int       @id @default(autoincrement())
+  eventId      Int
+  event        Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id])
+  registeredAt DateTime  @default(now())
+  attended     Boolean   @default(false)
+  attendedAt   DateTime?
+  @@unique([eventId, userId])
+  @@map("event_participants")
+}
+
+model Survey {
+  id          Int          @id @default(autoincrement())
+  title       String
+  description String?
+  status      SurveyStatus @default(DRAFT)
+  createdById Int
+  createdBy   User         @relation("SurveyCreator", fields: [createdById], references: [id])
+  regionId    Int?
+  region      Region?      @relation(fields: [regionId], references: [id])
+  districtId  Int?
+  district    District?    @relation(fields: [districtId], references: [id])
+  startsAt    DateTime?
+  endsAt      DateTime?
+  questions   SurveyQuestion[]
+  responses   SurveyResponse[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  @@map("surveys")
+}
+
+model SurveyQuestion {
+  id         Int          @id @default(autoincrement())
+  surveyId   Int
+  survey     Survey       @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  text       String
+  type       QuestionType @default(TEXT)
+  options    Json?
+  orderIndex Int
+  isRequired Boolean      @default(true)
+  answers    SurveyAnswer[]
+  createdAt  DateTime     @default(now())
+  @@map("survey_questions")
+}
+
+model SurveyResponse {
+  id        Int            @id @default(autoincrement())
+  surveyId  Int
+  survey    Survey         @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User           @relation(fields: [userId], references: [id])
+  answers   SurveyAnswer[]
+  createdAt DateTime       @default(now())
+  @@unique([surveyId, userId])
+  @@map("survey_responses")
+}
+
+model SurveyAnswer {
+  id         Int             @id @default(autoincrement())
+  responseId Int
+  response   SurveyResponse  @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  questionId Int
+  question   SurveyQuestion  @relation(fields: [questionId], references: [id])
+  value      String
+  @@map("survey_answers")
+}
+
+model FileRecord {
+  id           Int          @id @default(autoincrement())
+  originalName String
+  storedName   String
+  mimeType     String
+  size         Int
+  url          String
+  category     FileCategory @default(OTHER)
+  uploadedById Int
+  uploadedBy   User         @relation("FileUploader", fields: [uploadedById], references: [id])
+  entityType   String?
+  entityId     Int?
+  createdAt    DateTime     @default(now())
+  @@map("file_records")
+}
+
+model SmsLog {
+  id              Int       @id @default(autoincrement())
+  phone           String
+  message         String
+  status          SmsStatus @default(PENDING)
+  eskizMessageId  String?
+  errorMessage    String?
+  createdAt       DateTime  @default(now())
+  @@map("sms_logs")
+}
+
+model EmailLog {
+  id           Int         @id @default(autoincrement())
+  toEmail      String
+  subject      String
+  body         String
+  status       EmailStatus @default(PENDING)
+  errorMessage String?
+  createdAt    DateTime    @default(now())
+  @@map("email_logs")
 }

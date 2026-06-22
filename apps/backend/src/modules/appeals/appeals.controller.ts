@@ -7,11 +7,13 @@ import {
   Param,
   Body,
   Query,
+  Res,
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AppealsService } from './appeals.service';
+import { ExcelService } from '../export/excel.service';
 import { CreateAppealDto } from './dto/create-appeal.dto';
 import { FilterAppealDto } from './dto/filter-appeal.dto';
 import { UpdateAppealStatusDto } from './dto/update-appeal-status.dto';
@@ -27,7 +29,10 @@ import { Role } from '@prisma/client';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class AppealsController {
-  constructor(private appealsService: AppealsService) {}
+  constructor(
+    private appealsService: AppealsService,
+    private excelService: ExcelService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Murojaatlar ro\'yxati' })
@@ -141,5 +146,38 @@ export class AppealsController {
     @Body() dto: UpdateAppealStatusDto,
   ) {
     return this.appealsService.updateStatus(id, dto.status);
+  }
+
+  @Get('export/excel')
+  @Roles(Role.SUPER_ADMIN, Role.REPUBLIC_ADMIN, Role.REGION_ADMIN, Role.DISTRICT_ADMIN)
+  @ApiOperation({ summary: 'Murojaatlarni Excel formatda yuklash' })
+  async exportExcel(@Query() filter: FilterAppealDto, @CurrentUser() user: any, @Res() res: any) {
+    const result = await this.appealsService.findAll({ ...filter, limit: 10000 }, user);
+    const columns = [
+      { key: 'id', header: 'ID', width: 8 },
+      { key: 'title', header: 'Sarlavha', width: 30 },
+      { key: 'category', header: 'Kategoriya', width: 20 },
+      { key: 'status', header: 'Status', width: 15 },
+      { key: 'priority', header: 'Muhimlik', width: 12 },
+      { key: 'youth', header: 'Murojaat qiluvchi', width: 25 },
+      { key: 'region', header: 'Viloyat', width: 20 },
+      { key: 'createdAt', header: 'Yaratilgan sana', width: 20 },
+    ];
+    const data = result.data.map((a: any) => ({
+      id: a.id,
+      title: a.title,
+      category: a.category,
+      status: a.status,
+      priority: a.priority,
+      youth: a.youth?.fullName || '',
+      region: a.region?.nameUz || '',
+      createdAt: new Date(a.createdAt).toLocaleDateString('uz-UZ'),
+    }));
+    const buffer = await this.excelService.exportToExcel(columns, data);
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename=murojaatlar-${Date.now()}.xlsx`,
+    });
+    res.end(buffer);
   }
 }

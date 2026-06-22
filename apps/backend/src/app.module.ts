@@ -19,6 +19,11 @@ import { AuditLogModule } from './modules/audit-log/audit-log.module';
 import { RegionsModule } from './modules/regions/regions.module';
 import { BroadcastModule } from './modules/broadcast/broadcast.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { EventsModule } from './modules/events/events.module';
+import { SurveysModule } from './modules/surveys/surveys.module';
+import { ExportModule } from './modules/export/export.module';
+import { SmsModule } from './modules/sms/sms.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -41,6 +46,11 @@ import { UploadModule } from './modules/upload/upload.module';
     RegionsModule,
     BroadcastModule,
     UploadModule,
+    EventsModule,
+    SurveysModule,
+    ExportModule,
+    SmsModule,
+    EmailModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

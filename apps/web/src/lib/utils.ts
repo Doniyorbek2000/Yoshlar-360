@@ -29,6 +29,11 @@ export const statusLabels: Record<string, string> = {
   TODO: 'Rejada',
   DONE: 'Bajarilgan',
   CANCELLED: 'Bekor qilingan',
+  DRAFT: 'Qoralama',
+  UPCOMING: 'Rejalashtirilgan',
+  ONGOING: 'Davom etmoqda',
+  COMPLETED: 'Yakunlangan',
+  ACTIVE: 'Faol',
 };
 
 export const statusColors: Record<string, string> = {
@@ -41,6 +46,11 @@ export const statusColors: Record<string, string> = {
   TODO: 'bg-gray-100 text-gray-800',
   DONE: 'bg-green-100 text-green-800',
   CANCELLED: 'bg-red-100 text-red-800',
+  DRAFT: 'bg-gray-100 text-gray-800',
+  UPCOMING: 'bg-blue-100 text-blue-800',
+  ONGOING: 'bg-green-100 text-green-800',
+  COMPLETED: 'bg-emerald-100 text-emerald-800',
+  ACTIVE: 'bg-green-100 text-green-800',
 };
 
 export const priorityLabels: Record<string, string> = {

@@ -7,7 +7,7 @@ import { useAuthStore } from '@/store/auth';
 import {
   LayoutDashboard, Users, UserCheck, MessageSquare, AlertTriangle,
   ListTodo, BarChart3, FileText, Upload, Bell, Shield, LogOut,
-  MapPin, Building2, Home, Newspaper, Calendar, LineChart, Settings, User
+  MapPin, Building2, Home, Newspaper, Calendar, LineChart, Settings, User, ClipboardList
 } from 'lucide-react';
 
 const menuItems = [
@@ -26,6 +26,7 @@ const menuItems = [
   { href: '/notifications', label: 'Bildirishnomalar', icon: Bell, roles: ['SUPER_ADMIN', 'REPUBLIC_ADMIN', 'REGION_ADMIN', 'DISTRICT_ADMIN', 'MAHALLA_LEADER', 'MODERATOR', 'YOUTH'] },
   { href: '/news', label: 'Yangiliklar', icon: Newspaper, roles: ['SUPER_ADMIN', 'REPUBLIC_ADMIN', 'REGION_ADMIN', 'DISTRICT_ADMIN'] },
   { href: '/events', label: 'Tadbirlar', icon: Calendar, roles: ['SUPER_ADMIN', 'REPUBLIC_ADMIN', 'REGION_ADMIN', 'DISTRICT_ADMIN', 'MAHALLA_LEADER'] },
+  { href: '/surveys', label: 'So\'rovnomalar', icon: ClipboardList, roles: ['SUPER_ADMIN', 'REPUBLIC_ADMIN', 'REGION_ADMIN', 'DISTRICT_ADMIN'] },
   { href: '/analytics', label: 'Tahlil', icon: LineChart, roles: ['SUPER_ADMIN', 'REPUBLIC_ADMIN', 'REGION_ADMIN'] },
   { href: '/audit-logs', label: 'Audit log', icon: Shield, roles: ['SUPER_ADMIN', 'REPUBLIC_ADMIN'] },
   { href: '/settings', label: 'Sozlamalar', icon: Settings, roles: ['SUPER_ADMIN'] },
