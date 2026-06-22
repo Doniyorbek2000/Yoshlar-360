@@ -43,9 +43,9 @@ export default function SettingsPage() {
 
   const [permissions, setPermissions] = useState<Record<string, string[]>>({
     SUPER_ADMIN: ['all'],
-    REPUBLIC_ADMIN: ['dashboard', 'youth', 'appeals', 'tasks', 'problems', 'reports', 'kpi', 'users', 'regions', 'districts', 'mahallas', 'news', 'events', 'notifications', 'audit-logs', 'settings', 'imports', 'analytics'],
-    REGION_ADMIN: ['dashboard', 'youth', 'appeals', 'tasks', 'problems', 'reports', 'kpi', 'news', 'events', 'notifications'],
-    DISTRICT_ADMIN: ['dashboard', 'youth', 'appeals', 'tasks', 'problems', 'reports', 'notifications'],
+    REPUBLIC_ADMIN: ['dashboard', 'youth', 'appeals', 'tasks', 'problems', 'reports', 'kpi', 'users', 'regions', 'districts', 'mahallas', 'news', 'events', 'surveys', 'notifications', 'audit-logs', 'settings', 'imports', 'analytics'],
+    REGION_ADMIN: ['dashboard', 'youth', 'appeals', 'tasks', 'problems', 'reports', 'kpi', 'news', 'events', 'surveys', 'notifications'],
+    DISTRICT_ADMIN: ['dashboard', 'youth', 'appeals', 'tasks', 'problems', 'reports', 'surveys', 'notifications'],
     MAHALLA_LEADER: ['dashboard', 'youth', 'appeals', 'tasks', 'notifications'],
     YOUTH: ['dashboard', 'appeals', 'notifications'],
     MODERATOR: ['dashboard', 'youth', 'appeals', 'tasks', 'problems', 'news', 'events', 'notifications'],
@@ -84,12 +84,12 @@ export default function SettingsPage() {
     { key: 'notifications', label: 'Bildirishnomalar', icon: Bell },
   ];
 
-  const allModules = ['dashboard', 'youth', 'appeals', 'tasks', 'problems', 'reports', 'kpi', 'users', 'regions', 'districts', 'mahallas', 'news', 'events', 'notifications', 'audit-logs', 'settings', 'imports', 'analytics'];
+  const allModules = ['dashboard', 'youth', 'appeals', 'tasks', 'problems', 'reports', 'kpi', 'users', 'regions', 'districts', 'mahallas', 'news', 'events', 'surveys', 'notifications', 'audit-logs', 'settings', 'imports', 'analytics'];
   const moduleLabels: Record<string, string> = {
     dashboard: 'Boshqaruv paneli', youth: 'Yoshlar', appeals: 'Murojaatlar', tasks: 'Vazifalar',
     problems: 'Muammolar', reports: 'Hisobotlar', kpi: 'KPI', users: 'Foydalanuvchilar',
     regions: 'Viloyatlar', districts: 'Tumanlar', mahallas: 'Mahallalar', news: 'Yangiliklar',
-    events: 'Tadbirlar', notifications: 'Bildirishnomalar', 'audit-logs': 'Audit log',
+    events: 'Tadbirlar', surveys: 'So\'rovnomalar', notifications: 'Bildirishnomalar', 'audit-logs': 'Audit log',
     settings: 'Sozlamalar', imports: 'Import', analytics: 'Analitika',
   };
 
