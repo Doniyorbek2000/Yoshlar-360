@@ -1,18 +1,26 @@
-import { uz } from './uz';
-import { ru } from './ru';
+import * as fs from 'fs';
+import * as path from 'path';
 
-const translations: Record<string, typeof uz> = { uz, ru };
-const userLanguages: Record<number, string> = {};
+const locales: Record<string, Record<string, string>> = {};
 
-export function t(userId: number, key: keyof typeof uz): string {
-  const lang = userLanguages[userId] || 'uz';
-  return translations[lang]?.[key] || translations['uz'][key] || key;
+const localesDir = path.join(__dirname, 'locales');
+for (const file of fs.readdirSync(localesDir)) {
+  if (file.endsWith('.json')) {
+    const lang = file.replace('.json', '');
+    locales[lang] = JSON.parse(fs.readFileSync(path.join(localesDir, file), 'utf-8'));
+  }
 }
 
-export function setLanguage(userId: number, lang: string) {
-  userLanguages[userId] = lang;
+export function t(lang: string, key: string, params?: Record<string, string | number>): string {
+  let text = locales[lang]?.[key] || locales['uz']?.[key] || key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
+    }
+  }
+  return text;
 }
 
-export function getLanguage(userId: number): string {
-  return userLanguages[userId] || 'uz';
+export function getLocaleKeys(): string[] {
+  return Object.keys(locales['uz'] || {});
 }
